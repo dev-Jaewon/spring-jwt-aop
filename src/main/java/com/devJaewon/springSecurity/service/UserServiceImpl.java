@@ -1,5 +1,8 @@
 package com.devJaewon.springSecurity.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -7,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.devJaewon.springSecurity.dto.LoginDto;
 import com.devJaewon.springSecurity.dto.UserDto;
+import com.devJaewon.springSecurity.entity.RoleEntity;
 import com.devJaewon.springSecurity.entity.UserEntity;
+import com.devJaewon.springSecurity.repository.RoleRepository;
 import com.devJaewon.springSecurity.repository.UserRepository;
 import com.devJaewon.springSecurity.security.JwtProvider;
 
@@ -20,8 +25,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     public void create(UserDto user) {
-        userRepository.save(new UserEntity(user.getUserId(), passwordEncoder.encode(user.getPassword())));
+        RoleEntity role = roleRepository.findByName("USER");
+        String password = passwordEncoder.encode(user.getPassword());
+
+        List<RoleEntity> roles = new ArrayList<RoleEntity>();
+        roles.add(role);
+
+        userRepository.save(new UserEntity(user.getUserId(), password, roles));
     }
 
     public ResponseEntity<String> login(LoginDto loginInfo) {

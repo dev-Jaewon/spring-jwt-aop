@@ -1,9 +1,19 @@
 package com.devJaewon.springSecurity.entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.hibernate.annotations.ManyToAny;
+
 import jakarta.annotation.Nonnull;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Table;
 
 @Entity(name = "account")
@@ -12,23 +22,29 @@ public class UserEntity {
 
     @Id
     @GeneratedValue
+    @Column(name = "user_id")
     private Long id;
 
     @Nonnull
+    @Column(name = "name")
     private String userId;
 
     @Nonnull
+    @Column(name = "password")
     private String password;
 
     @Nonnull
-    private String role;
+    @ManyToAny(fetch = FetchType.LAZY)
+    @JoinTable(name = "account_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private List<RoleEntity> role = new ArrayList<RoleEntity>();
 
-    public UserEntity() {}
+    public UserEntity() {
+    }
 
-    public UserEntity(String userId, String password) {
+    public UserEntity(String userId, String password, List<RoleEntity> role) {
         this.userId = userId;
         this.password = password;
-        this.role = "USER";
+        this.role.addAll(role);
     }
 
     public Long getId() {
@@ -55,11 +71,12 @@ public class UserEntity {
         this.password = password;
     }
 
-    public String getRole() {
+    public List<RoleEntity> getRole() {
         return this.role;
     }
 
-    public void setRole(String role) {
+    public void setRole(List<RoleEntity> role) {
         this.role = role;
-    };
+    }
+
 }
