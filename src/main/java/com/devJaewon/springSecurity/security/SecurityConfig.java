@@ -5,34 +5,31 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        String password = passwordEncoder().encode("1234");
+    // 로그인 인증을 위한 In-Momery User 객체 주석처리
+    // @Bean
+    // InMemoryUserDetailsManager inMemoryUserDetailsManager() {
+    //     String password = passwordEncoder().encode("1234");
 
-        UserDetails user = User.withUsername("user")
-                .password(password)
-                .roles("USER")
-                .build();
+    //     UserDetails user = User.withUsername("user")
+    //             .password(password)
+    //             .roles("USER")
+    //             .build();
 
-        UserDetails admin = User.withUsername("admin")
-                .password(password)
-                .roles("ADMIN")
-                .build();
+    //     UserDetails admin = User.withUsername("admin")
+    //             .password(password)
+    //             .roles("ADMIN")
+    //             .build();
 
-        return new InMemoryUserDetailsManager(user, admin);
-    }
+    //     return new InMemoryUserDetailsManager(user, admin);
+    // }
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -41,14 +38,18 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/mypage").hasRole("USER")
-                .requestMatchers("/setting").hasRole("ADMIN")
-                .anyRequest().authenticated());
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/account/create").permitAll()
+                        .requestMatchers("/account/login").permitAll()
+                        .requestMatchers("/mypage").hasRole("USER")
+                        .requestMatchers("/setting").hasRole("ADMIN")
+                        .anyRequest().authenticated());
 
-        http.formLogin(form -> form
-                .permitAll());
+        http
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable());
 
         return http.build();
     }
