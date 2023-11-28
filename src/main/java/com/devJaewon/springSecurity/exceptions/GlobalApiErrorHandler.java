@@ -21,4 +21,13 @@ public class GlobalApiErrorHandler {
         return new ResponseEntity<>(map, httpStatus);
     }
 
+    @ExceptionHandler(value = BadRequestException.class)
+    public ResponseEntity<Map<String, String>> badRequestException(Exception e){
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+
+        Map<String, String> map = new HashMap<>();
+        map.put("message", "아이디 및 비밀번호를 확인해주세요.");
+
+        return new ResponseEntity<>(map, httpStatus);
+    }
 }
