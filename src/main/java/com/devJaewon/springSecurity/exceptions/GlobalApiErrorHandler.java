@@ -30,4 +30,14 @@ public class GlobalApiErrorHandler {
 
         return new ResponseEntity<>(map, httpStatus);
     }
+
+    @ExceptionHandler(value = ConflictException.class)
+    public ResponseEntity<Map<String, String>> conflictException(Exception e){
+              HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+
+        Map<String, String> map = new HashMap<>();
+        map.put("message", e.getMessage());
+
+        return new ResponseEntity<>(map, httpStatus);
+    }
 }
