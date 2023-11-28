@@ -12,6 +12,8 @@ import com.devJaewon.springSecurity.dto.LoginDto;
 import com.devJaewon.springSecurity.dto.UserDto;
 import com.devJaewon.springSecurity.entity.RoleEntity;
 import com.devJaewon.springSecurity.entity.UserEntity;
+import com.devJaewon.springSecurity.exceptions.BadRequestException;
+import com.devJaewon.springSecurity.exceptions.ConflictException;
 import com.devJaewon.springSecurity.repository.RoleRepository;
 import com.devJaewon.springSecurity.repository.UserRepository;
 import com.devJaewon.springSecurity.security.JwtProvider;
@@ -28,7 +30,13 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
-    public void create(UserDto user) {
+    public void create(UserDto user) throws ConflictException {
+        UserEntity checkUserId = userRepository.findByUserId(user.getUserId());
+
+        if(checkUserId != null){
+            throw new ConflictException("userId가 중복입니다.");
+        }
+
         RoleEntity role = roleRepository.findByName("USER");
         String password = passwordEncoder.encode(user.getPassword());
 
@@ -38,14 +46,15 @@ public class UserServiceImpl implements UserService {
         userRepository.save(new UserEntity(user.getUserId(), password, roles));
     }
 
-    public ResponseEntity<String> login(LoginDto loginInfo) {
-        UserEntity result = userRepository.findByUserId(loginInfo.getUserId());
+    public ResponseEntity<String> login(LoginDto loginInfo) throws BadRequestException {
+            UserEntity result = userRepository.findByUserId(loginInfo.getUserId());
 
-        if (result != null && passwordEncoder.matches(loginInfo.getPassword(), result.getPassword())) {
-            String accessToken = new JwtProvider().createAccessToken(loginInfo.getUserId());
-            return ResponseEntity.ok(accessToken);
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+            if (result != null && passwordEncoder.matches(loginInfo.getPassword(), result.getPassword())) {
+                String accessToken = new JwtProvider().createAccessToken(loginInfo.getUserId());
+                return ResponseEntity.ok(accessToken);
+            } else {
+                throw new BadRequestException();
+            }
+
     }
 }

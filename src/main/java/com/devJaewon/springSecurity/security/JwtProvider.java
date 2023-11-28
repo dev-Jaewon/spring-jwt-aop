@@ -8,7 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 public class JwtProvider {
-    private String SECRET_KEY = "Hello World. It's a Beautiful Day!";
+    private String SECRET_KEY = "REQUIRE PRIVATE SECURITY KEY!!!!";
     private String token = "";
 
     public JwtProvider() {
@@ -50,12 +50,4 @@ public class JwtProvider {
                 .getPayload()
                 .getSubject();
     }
-
-    // public Authentication getAuthentication() {
-    // User user = new User(getUserName(), "", Arrays.asList(new
-    // SimpleGrantedAuthority("user")));
-
-    // return UsernamePasswordAuthenticationToken.authenticated(user, this.token,
-    // user.getAuthorities());
-    // }
 }
